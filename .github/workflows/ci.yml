@@ -57,8 +57,8 @@ jobs:
               {
                 "crate": "grcov",
                 "version": "^0.8",
-                "pkg-url": "{ repo }/releases/download/v{ version }/{ name }-{ target }.{ archive-format }",
-                "pkg-fmt": "tgz"
+                "pkg_url": "{ repo }/releases/download/v{ version }/{ name }-{ target }.{ archive-format }",
+                "pkg_fmt": "tgz"
               }
             ]
 
