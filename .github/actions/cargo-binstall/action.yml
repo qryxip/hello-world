@@ -25,7 +25,7 @@ runs:
         ARCHIVE_EXT="${URL##*.}"
         ARCHIVE_PATH="$BIN_DIR/cargo-binstall.$ARCHIVE_EXT"
 
-        curl --proto =https --tlsv1.2 -fL --retry 10 --retry-connrefused "$URL" -o "$ARCHIVE_PATH"
+        retry curl --proto =https --tlsv1.2 -fL --retry 10 --retry-connrefused "$URL" -o "$ARCHIVE_PATH"
         case "$ARCHIVE_EXT" in
           zip) 7z x "$ARCHIVE_PATH" -o/tmp;;
           tgz) tar xvf "$ARCHIVE_PATH" -C /tmp;;
