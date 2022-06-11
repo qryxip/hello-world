@@ -52,7 +52,14 @@ jobs:
       - name: cargo-binstall
         uses: ./.github/actions/cargo-binstall
         with:
-          package-specs: grcov@^0.8
+          args: |
+            [
+              {
+                "crate": "grcov",
+                "version": "^0.8",
+                "pkg-url": "{ repo }/releases/download/v{ version }/{ name }-{ target }.{ archive-format }"
+              }
+            ]
 
       - run: >
           tr : '\n' <<<"$PATH"
@@ -118,7 +125,14 @@ jobs:
       - name: cargo-binstall
         uses: ./.github/actions/cargo-binstall
         with:
-          package-specs: cargo-udeps@^0.1
+          args: |
+            [
+              {
+                "crate": "cargo-udeps",
+                "version": "^0.1",
+                "pkg_url": "{ repo }/releases/download/v{ version }/{ name }-v{ version }-{ target }.{ archive-format }"
+              }
+            ]
 
       - name: Restore cache
         uses: actions/cache@v2

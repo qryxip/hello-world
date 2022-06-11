@@ -1,17 +1,12 @@
 name: Install tools with cargo-binstall
 
 inputs:
-  package-specs:
+  args:
     required: true
 
 runs:
   using: composite
   steps:
-    - name: Install Bash
-      run: brew install bash
-      shell: zsh {0}
-      if: runner.os == 'macOS'
-
     - run: bash --version
       shell: bash
 
@@ -40,30 +35,16 @@ runs:
           tgz) tar xvf "$ARCHIVE_PATH" -C "$BIN_DIR";;
         esac
         rm "$ARCHIVE_PATH"
+        export PATH="$BIN_DIR:$PATH"
         echo "Installed $BIN_DIR/cargo-binstall$EXE_SUFFIX" >&2
-        echo "$BIN_DIR" >>"$GITHUB_PATH"
-        ls -l "$BIN_DIR"
-      shell: bash
-      env:
-        OS: ${{ runner.os }}
 
-    - run: >
-        tr : '\n' <<<"$PATH"
-      shell: bash
-
-    - run: |
-        $Env:Path.Split(";")
-      shell: powershell
-      if: runner.os == 'Windows'
-
-    - name: Run cargo-binstall
-      run: |
-        mapfile -td , package_specs <<<"$PACKAGE_SPECS,"
-        unset 'package_specs[-1]'
-        for spec in "${package_specs[@]}"; do
-          printf 'Installing `%s`\n' "$spec" >&2
-          cargo binstall "${spec%@*}" --version "${spec#*@}" --no-confirm
+        jq '.[]' -c <<<"$ARGS" | while read -r arg; do
+          crate="$(jq .crate -r <<<"$arg")"
+          version="$(jq .version -r <<<"$arg")"
+          pkg_url="$(jq .pkg_url -r <<<"$arg")"
+          cargo binstall "$crate" --version "$version" --pkg-url "$pkg_url" --no-confirm
         done
       shell: bash
       env:
-        PACKAGE_SPECS: ${{ inputs.package-specs }}
+        OS: ${{ runner.os }}
+        ARGS: ${{ inputs.args }}
