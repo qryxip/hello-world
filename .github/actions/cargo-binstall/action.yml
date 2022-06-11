@@ -48,7 +48,7 @@ runs:
         unset 'package_specs[-1]'
         for spec in "${package_specs[@]}"; do
           printf 'Installing `%s`\n' "$spec" >&2
-          cargo binstall "${spec%@*}" --version "${spec#*@}"
+          cargo binstall "${spec%@*}" --version "${spec#*@}" --no-confirm
         done
       shell: bash
       env:
