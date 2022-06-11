@@ -34,6 +34,7 @@ runs:
         rm "$ARCHIVE_PATH"
         echo "Installed $BIN_DIR/cargo-binstall$EXE_SUFFIX" >&2
         echo "$BIN_DIR" >>"$GITHUB_PATH"
+        ls -l "$BIN_DIR"
       shell: bash
       env:
         OS: ${{ runner.os }}
