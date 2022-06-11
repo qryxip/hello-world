@@ -25,7 +25,7 @@ jobs:
           toolchain: stable
           default: true
           profile: minimal
-          components: llvm-tools-preview, rustfmt
+          components: rustfmt
 
       - name: cargo-fmt
         uses: actions-rs/cargo@v1
@@ -47,6 +47,7 @@ jobs:
         with:
           toolchain: stable
           profile: minimal
+          components: llvm-tools-preview
 
       - name: cargo-binstall
         uses: ./.github/actions/cargo-binstall
