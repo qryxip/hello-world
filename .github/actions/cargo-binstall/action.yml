@@ -9,9 +9,11 @@ runs:
   steps:
     - name: Install Bash
       run: brew install bash
+      shell: zsh
       if: runner.os == 'macOS'
 
     - run: bash --version
+      shell: bash
 
     - name: Install cargo-binstall *
       run: |
