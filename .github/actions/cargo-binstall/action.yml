@@ -7,6 +7,12 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Install Bash
+      run: brew install bash
+      if: runner.os == 'macOS'
+
+    - run: bash --version
+
     - name: Install cargo-binstall *
       run: |
         BIN_DIR=/tmp/cargo-binstall
