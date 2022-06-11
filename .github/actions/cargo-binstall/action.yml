@@ -28,8 +28,8 @@ runs:
         mkdir -p "$BIN_DIR"
         curl --proto =https --tlsv1.2 -fL --retry 10 --retry-connrefused "$URL" -o "$ARCHIVE_PATH"
         case "$ARCHIVE_EXT" in
-          zip) 7z x "$ARCHIVE_PATH" "-o$BIN_PATH";;
-          tgz) tar xvf "$ARCHIVE_PATH" -C "$BIN_PATH";;
+          zip) 7z x "$ARCHIVE_PATH" "-o$BIN_DIR";;
+          tgz) tar xvf "$ARCHIVE_PATH" -C "$BIN_DIR";;
         esac
         rm "$ARCHIVE_PATH"
         echo "Installed $BIN_DIR/cargo-binstall$EXE_SUFFIX" >&2
