@@ -1,0 +1,207 @@
+name: CI
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'
+  push:
+    branches:
+      - master
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+**'
+  pull_request:
+
+jobs:
+  rustfmt:
+    name: Rustfmt
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up `stable`
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          default: true
+          profile: minimal
+          components: rustfmt
+
+      - name: cargo-fmt
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all -- --check
+
+  grcov:
+    name: grcov
+    runs-on: ubuntu-20.04
+    if: ${{ github.repository_owner == 'qryxip' && github.ref == 'refs/heads/master' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up `stable`
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+
+      - name: cargo-binstall
+        uses: ./.github/actions/cargo-binstall
+        with:
+          package-specs: grcov@^0.8
+
+      - run: >
+          tr : '\n' <<<"$PATH"
+        shell: bash
+
+      - name: cargo-test
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --no-fail-fast -v -- --test-threads 1
+        env:
+          RUSTFLAGS: '-Cinstrument-coverage'
+          RUST_BACKTRACE: full
+          LLVM_PROFILE_FILE: '%p-%m.profraw'
+
+      - name: grcov
+        run: grcov . -b ./target/debug -s . -t lcov --branch --ignore-not-existing --ignore '/*' -o lcov.info
+
+      - name: Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: lcov.info
+
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        target-triple:
+          - x86_64-pc-windows-msvc
+          - x86_64-apple-darwin
+          - x86_64-unknown-linux-gnu
+        include:
+          - { channel: stable, target-triple: x86_64-pc-windows-msvc  , exe-suffix: .exe, os: windows-2022 }
+          - { channel: stable, target-triple: x86_64-apple-darwin     , exe-suffix: ''  , os: macos-11     }
+          - { channel: stable, target-triple: x86_64-unknown-linux-gnu, exe-suffix: ''  , os: ubuntu-20.04 }
+
+    name: stable-${{ matrix.target-triple }}
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up `stable`
+        id: install-toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.target-triple }}
+          default: true
+          profile: minimal
+          components: clippy
+
+      - name: Set up `nightly`
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          target: ${{ matrix.target-triple }}
+          default: false
+          profile: minimal
+
+      - name: cargo-binstall
+        uses: ./.github/actions/cargo-binstall
+        with:
+          package-specs: cargo-udeps@^0.1
+
+      - name: Restore cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/git
+            ~/.cargo/registry
+            ./target
+          key: build-stable-${{ matrix.target-triple }}-${{ steps.install-toolchain.outputs.rustc_hash }}-${{ hashFiles('./Cargo.*') }}
+
+      - name: cargo-clippy
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: --all-targets --target ${{ matrix.target-triple }} -- -D warnings
+
+      - name: cargo-test
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --no-fail-fast --target ${{ matrix.target-triple }}
+        env:
+          RUST_BACKTRACE: full
+
+      - name: cargo-udeps
+        uses: actions-rs/cargo@v1
+        with:
+          command: udeps
+          args: --all-targets
+          toolchain: nightly
+
+  upload-release-notes:
+    name: Upload the release notes
+    runs-on: ubuntu-20.04
+    if: ${{ startsWith(github.ref, 'refs/tags/') }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
+
+      - name: Prepare release notes
+        run: |
+          with open('./CHANGELOG.md') as file:
+              changelog = file.read()
+          output = ''
+          inside_subsection = False
+          for line in changelog.splitlines():
+              is_h2 = line.startswith('## ')
+              if not inside_subsection and is_h2:
+                  inside_subsection = True
+              elif inside_subsection and not is_h2:
+                  output += line + '\n'
+              elif inside_subsection:
+                  break
+          with open('./release-notes.md', 'w') as file:
+              file.write(output)
+        shell: python
+
+      - name: Upload the release notes
+        uses: actions/upload-artifact@v2
+        with:
+          name: release-notes
+          path: release-notes.md
+
+  release:
+    name: GitHub Release
+    runs-on: ubuntu-20.04
+    needs: [rustfmt, build, upload-release-notes]
+
+    steps:
+      - name: Download the release notes
+        uses: actions/download-artifact@v2
+        with:
+          name: release-notes
+          path: .
+
+      - name: GH Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: ./release-notes.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

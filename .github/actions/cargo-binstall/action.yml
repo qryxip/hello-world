@@ -1,0 +1,56 @@
+name: Install tools with cargo-binstall
+
+inputs:
+  package-specs:
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Install cargo-binstall *
+      run: |
+        BIN_DIR=/tmp/cargo-binstall
+        case "$OS" in
+          Windows)
+            URL_SUFFIX=x86_64-pc-windows-msvc.zip
+            EXE_SUFFIX=.exe;;
+          macOS)
+            URL_SUFFIX=x86_64-apple-darwin.zip
+            EXE_SUFFIX=;;
+          Linux)
+            URL_SUFFIX=x86_64-unknown-linux-musl.tgz
+            EXE_SUFFIX=;;
+        esac
+        URL="https://github.com/ryankurte/cargo-binstall/releases/latest/download/cargo-binstall-$URL_SUFFIX"
+        ARCHIVE_EXT="${URL##*.}"
+        ARCHIVE_PATH="$BIN_DIR/cargo-binstall.$ARCHIVE_EXT"
+
+        curl --proto =https --tlsv1.2 -fL --retry 10 --retry-connrefused "$URL" -o "$ARCHIVE_PATH"
+        case "$ARCHIVE_EXT" in
+          zip) 7z x "$ARCHIVE_PATH" -o/tmp;;
+          tgz) tar xvf "$ARCHIVE_PATH" -C /tmp;;
+        esac
+        rm "$ARCHIVE_PATH"
+        mkdir -p "$BIN_DIR"
+        mv "/tmp/cargo-binstall$EXE_SUFFIX" "$BIN_DIR"
+        echo "Installed $BIN_DIR/cargo-binstall$EXE_SUFFIX" >&2
+        echo "$BIN_DIR" >>"$GITHUB_PATH"
+      shell: bash
+      env:
+        OS: ${{ runner.os }}
+
+    - run: >
+        tr : '\n' <<<"$PATH"
+      shell: bash
+
+    - name: Run cargo-binstall
+      run: |
+        mapfile -td , package_specs <<<"$PACKAGE_SPECS,"
+        unset 'package_specs[-1]'
+        for spec in "${package_specs[@]}"; do
+          printf 'Installing `%s`\n' "$spec" >&2
+          cargo binstall "${spec%@*}" --version "${spec#*@}"
+        done
+      shell: bash
+      env:
+        PACKAGE_SPECS: ${{ inputs.package-specs }}
