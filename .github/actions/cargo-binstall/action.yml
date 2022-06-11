@@ -51,6 +51,11 @@ runs:
         tr : '\n' <<<"$PATH"
       shell: bash
 
+    - run: |
+        $Env.Path.Split(";")
+      shell: powershell
+      if: runner.os == 'Windows'
+
     - name: Run cargo-binstall
       run: |
         mapfile -td , package_specs <<<"$PACKAGE_SPECS,"
