@@ -42,7 +42,8 @@ runs:
           crate="$(jq .crate -r <<<"$arg")"
           version="$(jq .version -r <<<"$arg")"
           pkg_url="$(jq .pkg_url -r <<<"$arg")"
-          cargo binstall "$crate" --version "$version" --pkg-url "$pkg_url" --no-confirm
+          pkg_fmt="$(jq .pkg_fmt -r <<<"$arg")"
+          cargo binstall "$crate" --version "$version" --pkg-url "$pkg_url" --pkg-fmt "$pkg_fmt" --no-confirm
         done
       shell: bash
       env:
