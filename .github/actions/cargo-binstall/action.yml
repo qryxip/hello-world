@@ -23,16 +23,15 @@ runs:
         esac
         URL="https://github.com/ryankurte/cargo-binstall/releases/latest/download/cargo-binstall-$URL_SUFFIX"
         ARCHIVE_EXT="${URL##*.}"
-        ARCHIVE_PATH="$BIN_DIR/cargo-binstall.$ARCHIVE_EXT"
+        ARCHIVE_PATH="/tmp/cargo-binstall.$ARCHIVE_EXT"
 
         mkdir -p "$BIN_DIR"
         curl --proto =https --tlsv1.2 -fL --retry 10 --retry-connrefused "$URL" -o "$ARCHIVE_PATH"
         case "$ARCHIVE_EXT" in
-          zip) 7z x "$ARCHIVE_PATH" -o/tmp;;
-          tgz) tar xvf "$ARCHIVE_PATH" -C /tmp;;
+          zip) 7z x "$ARCHIVE_PATH" "-o$BIN_PATH";;
+          tgz) tar xvf "$ARCHIVE_PATH" -C "$BIN_PATH";;
         esac
         rm "$ARCHIVE_PATH"
-        mv "/tmp/cargo-binstall$EXE_SUFFIX" "$BIN_DIR"
         echo "Installed $BIN_DIR/cargo-binstall$EXE_SUFFIX" >&2
         echo "$BIN_DIR" >>"$GITHUB_PATH"
       shell: bash
