@@ -52,7 +52,7 @@ runs:
       shell: bash
 
     - run: |
-        $Env.Path.Split(";")
+        $Env:Path.Split(";")
       shell: powershell
       if: runner.os == 'Windows'
 
