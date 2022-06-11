@@ -25,7 +25,7 @@ jobs:
           toolchain: stable
           default: true
           profile: minimal
-          components: rustfmt
+          components: llvm-tools-preview, rustfmt
 
       - name: cargo-fmt
         uses: actions-rs/cargo@v1
