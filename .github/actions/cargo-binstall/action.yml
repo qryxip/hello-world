@@ -28,15 +28,16 @@ runs:
         CARGO_BINSTALL_ARCHIVE_EXT="${CARGO_BINSTALL_URL##*.}"
         CARGO_BINSTALL_ARCHIVE_PATH="/tmp/cargo-binstall.$CARGO_BINSTALL_ARCHIVE_EXT"
 
-        mkdir -p "$CARGO_BINSTALL_BIN_DIR"
-        curl --proto =https --tlsv1.2 -fL --retry 10 --retry-connrefused "$CARGO_BINSTALL_URL" -o "$CARGO_BINSTALL_ARCHIVE_PATH"
-        case "$CARGO_BINSTALL_ARCHIVE_EXT" in
-          zip) 7z x "$CARGO_BINSTALL_ARCHIVE_PATH" "-o$CARGO_BINSTALL_BIN_DIR";;
-          tgz) tar xvf "$CARGO_BINSTALL_ARCHIVE_PATH" -C "$CARGO_BINSTALL_BIN_DIR";;
-        esac
-        rm "$CARGO_BINSTALL_ARCHIVE_PATH"
-        export PATH="$CARGO_BINSTALL_BIN_DIR:$PATH"
-        echo "Installed $CARGO_BINSTALL_BIN_DIR/cargo-binstall$CARGO_BINSTALL_EXE_SUFFIX" >&2
+        #mkdir -p "$CARGO_BINSTALL_BIN_DIR"
+        #curl --proto =https --tlsv1.2 -fL --retry 10 --retry-connrefused "$CARGO_BINSTALL_URL" -o "$CARGO_BINSTALL_ARCHIVE_PATH"
+        #case "$CARGO_BINSTALL_ARCHIVE_EXT" in
+        #  zip) 7z x "$CARGO_BINSTALL_ARCHIVE_PATH" "-o$CARGO_BINSTALL_BIN_DIR";;
+        #  tgz) tar xvf "$CARGO_BINSTALL_ARCHIVE_PATH" -C "$CARGO_BINSTALL_BIN_DIR";;
+        #esac
+        #rm "$CARGO_BINSTALL_ARCHIVE_PATH"
+        #export PATH="$CARGO_BINSTALL_BIN_DIR:$PATH"
+        #echo "Installed $CARGO_BINSTALL_BIN_DIR/cargo-binstall$CARGO_BINSTALL_EXE_SUFFIX" >&2
+        cargo install --git https://github.com/qryxip/cargo-binstall --rev 0e3db06fa253a96204841505ee04b3fdbdf95700
 
         jq '.[]' -c <<<"$ARGS" | while read -r arg; do
           crate="$(jq .crate -r <<<"$arg")"
