@@ -37,7 +37,7 @@ runs:
         #rm "$ARCHIVE_PATH"
         #export PATH="$BIN_DIR:$PATH"
         #echo "Installed $BIN_DIR/cargo-binstall$EXE_SUFFIX" >&2
-        cargo install --git https://github.com/qryxip/cargo-binstall --rev e4e981549dbafd2db7ee8bae1c5d17af4d7d58eb
+        cargo install --git https://github.com/qryxip/cargo-binstall --rev b10234a9a88b015ade243305bce7e9ea2541d443
 
         jq '.[]' -c <<<"$ARGS" | while read -r arg; do
           crate="$(jq .crate -r <<<"$arg")"
