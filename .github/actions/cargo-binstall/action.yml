@@ -39,6 +39,10 @@ runs:
         #echo "Installed $CARGO_BINSTALL_BIN_DIR/cargo-binstall$CARGO_BINSTALL_EXE_SUFFIX" >&2
         cargo install --git https://github.com/qryxip/cargo-binstall --rev 0e3db06fa253a96204841505ee04b3fdbdf95700
 
+        if [ ! -d "${CARGO_HOME:-"$HOME/.cargo"}/bin" ]; then
+          mkdir -p "${CARGO_HOME:-"$HOME/.cargo"}/bin"
+        fi
+
         jq '.[]' -c <<<"$ARGS" | while read -r arg; do
           crate="$(jq .crate -r <<<"$arg")"
           version="$(jq .version -r <<<"$arg")"
