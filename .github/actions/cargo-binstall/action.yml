@@ -38,14 +38,12 @@ runs:
         export PATH="$BIN_DIR:$PATH"
         echo "Installed $BIN_DIR/cargo-binstall$EXE_SUFFIX" >&2
 
-        export RUST_LOG=cargo_binstall=debug
-
         jq '.[]' -c <<<"$ARGS" | while read -r arg; do
           crate="$(jq .crate -r <<<"$arg")"
           version="$(jq .version -r <<<"$arg")"
           pkg_url="$(jq .pkg_url -r <<<"$arg")"
           pkg_fmt="$(jq .pkg_fmt -r <<<"$arg")"
-          cargo binstall "$crate" --version "$version" --pkg-url "$pkg_url" --pkg-fmt "$pkg_fmt" --no-confirm
+          RUST_LOG=cargo_binstall cargo binstall "$crate" --version "$version" --pkg-url "$pkg_url" --pkg-fmt "$pkg_fmt" --no-confirm
         done
       shell: bash
       env:
