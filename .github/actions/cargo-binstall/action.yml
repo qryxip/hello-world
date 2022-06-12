@@ -38,6 +38,8 @@ runs:
         export PATH="$BIN_DIR:$PATH"
         echo "Installed $BIN_DIR/cargo-binstall$EXE_SUFFIX" >&2
 
+        export RUST_LOG=cargo_binstall=debug
+
         jq '.[]' -c <<<"$ARGS" | while read -r arg; do
           crate="$(jq .crate -r <<<"$arg")"
           version="$(jq .version -r <<<"$arg")"
