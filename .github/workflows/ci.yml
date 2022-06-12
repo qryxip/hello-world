@@ -59,7 +59,7 @@ jobs:
                 "version": "^0.8",
                 "pkg_url": "{ repo }/releases/download/v{ version }/{ name }-{ target }.tar.gz",
                 "pkg_fmt": "tgz",
-                "bin_dir": "{ name }-{ target }/{ bin }{ binary-ext }"
+                "bin_dir": "{ bin }{ binary-ext }"
               }
             ]
 
