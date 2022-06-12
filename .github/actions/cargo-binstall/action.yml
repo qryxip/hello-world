@@ -12,31 +12,35 @@ runs:
 
     - name: Install cargo-binstall *
       run: |
-        BIN_DIR=/tmp/cargo-binstall
+        CARGO_BINSTALL_BIN_DIR=/tmp/cargo-binstall
         case "$OS" in
           Windows)
-            URL_SUFFIX=x86_64-pc-windows-msvc.zip
-            EXE_SUFFIX=.exe;;
+            CARGO_BINSTALL_URL_SUFFIX=x86_64-pc-windows-msvc.zip
+            CARGO_BINSTALL_EXE_SUFFIX=.exe;;
           macOS)
-            URL_SUFFIX=x86_64-apple-darwin.zip
-            EXE_SUFFIX=;;
+            CARGO_BINSTALL_URL_SUFFIX=x86_64-apple-darwin.zip
+            CARGO_BINSTALL_EXE_SUFFIX=;;
           Linux)
-            URL_SUFFIX=x86_64-unknown-linux-musl.tgz
-            EXE_SUFFIX=;;
+            CARGO_BINSTALL_URL_SUFFIX=x86_64-unknown-linux-musl.tgz
+            CARGO_BINSTALL_EXE_SUFFIX=;;
         esac
-        URL="https://github.com/ryankurte/cargo-binstall/releases/latest/download/cargo-binstall-$URL_SUFFIX"
-        ARCHIVE_EXT="${URL##*.}"
-        ARCHIVE_PATH="/tmp/cargo-binstall.$ARCHIVE_EXT"
+        CARGO_BINSTALL_URL="https://github.com/ryankurte/cargo-binstall/releases/latest/download/cargo-binstall-$CARGO_BINSTALL_URL_SUFFIX"
+        CARGO_BINSTALL_ARCHIVE_EXT="${CARGO_BINSTALL_URL##*.}"
+        CARGO_BINSTALL_ARCHIVE_PATH="/tmp/cargo-binstall.$CARGO_BINSTALL_ARCHIVE_EXT"
 
-        mkdir -p "$BIN_DIR"
-        curl --proto =https --tlsv1.2 -fL --retry 10 --retry-connrefused "$URL" -o "$ARCHIVE_PATH"
-        case "$ARCHIVE_EXT" in
-          zip) 7z x "$ARCHIVE_PATH" "-o$BIN_DIR";;
-          tgz) tar xvf "$ARCHIVE_PATH" -C "$BIN_DIR";;
+        mkdir -p "$CARGO_BINSTALL_BIN_DIR"
+        curl --proto =https --tlsv1.2 -fL --retry 10 --retry-connrefused "$CARGO_BINSTALL_URL" -o "$CARGO_BINSTALL_ARCHIVE_PATH"
+        case "$CARGO_BINSTALL_ARCHIVE_EXT" in
+          zip) 7z x "$CARGO_BINSTALL_ARCHIVE_PATH" "-o$CARGO_BINSTALL_BIN_DIR";;
+          tgz) tar xvf "$CARGO_BINSTALL_ARCHIVE_PATH" -C "$CARGO_BINSTALL_BIN_DIR";;
         esac
-        rm "$ARCHIVE_PATH"
-        export PATH="$BIN_DIR:$PATH"
-        echo "Installed $BIN_DIR/cargo-binstall$EXE_SUFFIX" >&2
+        rm "$CARGO_BINSTALL_ARCHIVE_PATH"
+        export PATH="$CARGO_BINSTALL_BIN_DIR:$PATH"
+        echo "Installed $CARGO_BINSTALL_BIN_DIR/cargo-binstall$CARGO_BINSTALL_EXE_SUFFIX" >&2
+
+        if [ ! -d "${CARGO_HOME:-"$HOME/.cargo"}/bin" ]; then
+          mkdir -p "${CARGO_HOME:-"$HOME/.cargo"}/bin"
+        fi
 
         jq '.[]' -c <<<"$ARGS" | while read -r arg; do
           crate="$(jq .crate -r <<<"$arg")"
