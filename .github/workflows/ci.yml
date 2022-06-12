@@ -58,7 +58,8 @@ jobs:
                 "crate": "grcov",
                 "version": "^0.8",
                 "pkg_url": "{ repo }/releases/download/v{ version }/{ name }-{ target }.{ archive-format }",
-                "pkg_fmt": "tgz"
+                "pkg_fmt": "tgz",
+                "bin_dir": "{ name }-{ target }/{ bin }{ binary-ext }"
               }
             ]
 
@@ -132,7 +133,8 @@ jobs:
                 "crate": "cargo-udeps",
                 "version": "^0.1",
                 "pkg_url": "{ repo }/releases/download/v{ version }/{ name }-v{ version }-{ target }.{ archive-format }",
-                "pkg_fmt": ${{ toJSON(matrix.cargo-udeps-pkg-fmt) }}
+                "pkg_fmt": ${{ toJSON(matrix.cargo-udeps-pkg-fmt) }},
+                "bin_dir": "{ name }-v{ version }-{ target }/{ bin }{ binary-ext }"
               }
             ]
 

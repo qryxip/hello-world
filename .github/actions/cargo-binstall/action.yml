@@ -47,7 +47,8 @@ runs:
           version="$(jq .version -r <<<"$arg")"
           pkg_url="$(jq .pkg_url -r <<<"$arg")"
           pkg_fmt="$(jq .pkg_fmt -r <<<"$arg")"
-          cargo binstall "$crate" --version "$version" --pkg-url "$pkg_url" --pkg-fmt "$pkg_fmt" --log-level debug --no-confirm
+          bin_dir="$(jq .bin_dir -r <<<"$arg")"
+          cargo binstall "$crate" --version "$version" --pkg-url "$pkg_url" --pkg-fmt "$pkg_fmt" --bin-dir "$bin_dir" --log-level debug --no-confirm
         done
       shell: bash
       env:
