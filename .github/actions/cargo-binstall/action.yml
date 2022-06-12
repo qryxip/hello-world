@@ -38,10 +38,6 @@ runs:
         export PATH="$CARGO_BINSTALL_BIN_DIR:$PATH"
         echo "Installed $CARGO_BINSTALL_BIN_DIR/cargo-binstall$CARGO_BINSTALL_EXE_SUFFIX" >&2
 
-        if [ ! -d "${CARGO_HOME:-"$HOME/.cargo"}/bin" ]; then
-          mkdir -p "${CARGO_HOME:-"$HOME/.cargo"}/bin"
-        fi
-
         jq '.[]' -c <<<"$ARGS" | while read -r arg; do
           crate="$(jq .crate -r <<<"$arg")"
           version="$(jq .version -r <<<"$arg")"
