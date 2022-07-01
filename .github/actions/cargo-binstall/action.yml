@@ -12,36 +12,26 @@ runs:
 
     - name: Install cargo-binstall *
       run: |
-        CARGO_BINSTALL_BIN_DIR=/tmp/cargo-binstall
         case "$OS" in
-          Windows)
-            CARGO_BINSTALL_URL_SUFFIX=x86_64-pc-windows-msvc.zip
-            CARGO_BINSTALL_EXE_SUFFIX=.exe;;
-          macOS)
-            CARGO_BINSTALL_URL_SUFFIX=x86_64-apple-darwin.zip
-            CARGO_BINSTALL_EXE_SUFFIX=;;
-          Linux)
-            CARGO_BINSTALL_URL_SUFFIX=x86_64-unknown-linux-musl.tgz
-            CARGO_BINSTALL_EXE_SUFFIX=;;
+          Windows) cargo_binstall_url_suffix=x86_64-pc-windows-msvc.zip;;
+          macOS)   cargo_binstall_url_suffix=x86_64-apple-darwin.zip;;
+          Linux)   cargo_binstall_url_suffix=x86_64-unknown-linux-musl.tgz;;
         esac
-        CARGO_BINSTALL_URL="https://github.com/ryankurte/cargo-binstall/releases/latest/download/cargo-binstall-$CARGO_BINSTALL_URL_SUFFIX"
-        CARGO_BINSTALL_ARCHIVE_EXT="${CARGO_BINSTALL_URL##*.}"
-        CARGO_BINSTALL_ARCHIVE_PATH="/tmp/cargo-binstall.$CARGO_BINSTALL_ARCHIVE_EXT"
+        cargo_binstall_url="https://github.com/ryankurte/cargo-binstall/releases/latest/download/cargo-binstall-$cargo_binstall_url_suffix"
+        cargo_binstall_archive_ext="${cargo_binstall_url_suffix##*.}"
 
-        #mkdir -p "$CARGO_BINSTALL_BIN_DIR"
-        #curl --proto =https --tlsv1.2 -fL --retry 10 --retry-connrefused "$CARGO_BINSTALL_URL" -o "$CARGO_BINSTALL_ARCHIVE_PATH"
-        #case "$CARGO_BINSTALL_ARCHIVE_EXT" in
-        #  zip) 7z x "$CARGO_BINSTALL_ARCHIVE_PATH" "-o$CARGO_BINSTALL_BIN_DIR";;
-        #  tgz) tar xvf "$CARGO_BINSTALL_ARCHIVE_PATH" -C "$CARGO_BINSTALL_BIN_DIR";;
-        #esac
-        #rm "$CARGO_BINSTALL_ARCHIVE_PATH"
-        #export PATH="$CARGO_BINSTALL_BIN_DIR:$PATH"
-        #echo "Installed $CARGO_BINSTALL_BIN_DIR/cargo-binstall$CARGO_BINSTALL_EXE_SUFFIX" >&2
-        cargo install --git https://github.com/qryxip/cargo-binstall --rev 0e3db06fa253a96204841505ee04b3fdbdf95700
+        cargo_binstall_tempdir="$(mktemp -d cargo-binstall-XXXXXXXX)"
+        trap 'rm -r "$cargo_binstall_tempdir"' EXIT
 
-        if [ ! -d "${CARGO_HOME:-"$HOME/.cargo"}/bin" ]; then
-          mkdir -p "${CARGO_HOME:-"$HOME/.cargo"}/bin"
-        fi
+        cargo_binstall_archive_path="$cargo_binstall_tempdir/cargo-binstall.$cargo_binstall_archive_ext"
+
+        curl --proto =https --tlsv1.2 -fL --retry 10 --retry-connrefused "$cargo_binstall_url" -o "$cargo_binstall_archive_path"
+        case "$cargo_binstall_archive_ext" in
+          zip) 7z x "$cargo_binstall_archive_path" "-o$cargo_binstall_tempdir";;
+          tgz) tar xvf "$cargo_binstall_archive_path" -C "$cargo_binstall_tempdir";;
+        esac
+        export PATH="$cargo_binstall_tempdir:$PATH"
+        echo "Installed $(command -v cargo-binstall)" >&2
 
         jq '.[]' -c <<<"$ARGS" | while read -r arg; do
           crate="$(jq .crate -r <<<"$arg")"
@@ -49,7 +39,15 @@ runs:
           pkg_url="$(jq .pkg_url -r <<<"$arg")"
           pkg_fmt="$(jq .pkg_fmt -r <<<"$arg")"
           bin_dir="$(jq .bin_dir -r <<<"$arg")"
-          cargo binstall "$crate" --version "$version" --pkg-url "$pkg_url" --pkg-fmt "$pkg_fmt" --bin-dir "$bin_dir" --log-level debug --no-confirm
+          cargo binstall \
+            "$crate" \
+            --version "$version" \
+            --pkg-url "$pkg_url" \
+            --pkg-fmt "$pkg_fmt" \
+            --bin-dir "$bin_dir" \
+            --log-level debug \
+            --min-tls-version 1.2 \
+            --no-confirm
         done
       shell: bash
       env:
