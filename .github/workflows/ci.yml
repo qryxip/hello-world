@@ -127,14 +127,9 @@ jobs:
       - run: |
           type tar
           tar --version
+          type gtar
+          gtar --version
         shell: bash
-
-      - run: |
-          brew install gnu-tar
-          type tar
-          tar --version
-        shell: bash
-        if: ${{ runner.os == 'macOS' }}
 
       - name: cargo-binstall
         uses: ./.github/actions/cargo-binstall
