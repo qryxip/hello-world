@@ -57,7 +57,8 @@ jobs:
         with:
           command: binstall
           args: |
-            grcov@^0.8
+            grcov
+            --version ^0.8
             --pkg-url '{ repo }/releases/download/v{ version }/{ name }-{ target }.tar.bz2'
             --pkg-fmt tbz2
             --bin-dir '{ bin }{ binary-ext }'
@@ -132,7 +133,8 @@ jobs:
         with:
           command: binstall
           args: |
-            cargo-udeps@^0.1
+            cargo-udeps
+            --version ^0.1
             --pkg-url '{ repo }/releases/download/v{ version }/{ name }-v{ version }-{ target }.${{ matrix.cargo-udeps-archive-format }}'
             --pkg-fmt ${{ toJSON(matrix.cargo-udeps-pkg-fmt) }}
             --bin-dir '{ name }-v{ version }-{ target }/{ bin }{ binary-ext }'
