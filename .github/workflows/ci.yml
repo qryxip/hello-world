@@ -123,13 +123,6 @@ jobs:
           default: false
           profile: minimal
 
-      - run: |
-          type tar
-          tar --version
-          type gtar
-          gtar --version
-        shell: bash
-
       - name: Install cargo-binstall
         uses: taiki-e/install-action@cargo-binstall
 
