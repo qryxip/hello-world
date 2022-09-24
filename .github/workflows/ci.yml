@@ -61,6 +61,7 @@ jobs:
             --pkg-url '{ repo }/releases/download/v{ version }/{ name }-{ target }.tar.bz2'
             --pkg-fmt tbz2
             --bin-dir '{ bin }{ binary-ext }'
+            --no-confirm
 
       - run: >
           tr : '\n' <<<"$PATH"
@@ -135,6 +136,7 @@ jobs:
             --pkg-url '{ repo }/releases/download/v{ version }/{ name }-v{ version }-{ target }.${{ matrix.cargo-udeps-archive-format }}'
             --pkg-fmt ${{ toJSON(matrix.cargo-udeps-pkg-fmt) }}
             --bin-dir '{ name }-v{ version }-{ target }/{ bin }{ binary-ext }'
+            --no-confirm
 
       - name: Restore cache
         uses: actions/cache@v2
