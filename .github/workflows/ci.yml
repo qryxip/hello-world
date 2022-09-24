@@ -136,7 +136,7 @@ jobs:
             cargo-udeps
             --version ^0.1
             --pkg-url '{ repo }/releases/download/v{ version }/{ name }-v{ version }-{ target }.${{ matrix.cargo-udeps-archive-format }}'
-            --pkg-fmt ${{ toJSON(matrix.cargo-udeps-pkg-fmt) }}
+            --pkg-fmt ${{ matrix.cargo-udeps-pkg-fmt }}
             --bin-dir '{ name }-v{ version }-{ target }/{ bin }{ binary-ext }'
             --no-confirm
 
