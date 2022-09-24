@@ -49,19 +49,18 @@ jobs:
           profile: minimal
           components: llvm-tools-preview
 
-      - name: cargo-binstall
-        uses: ./.github/actions/cargo-binstall
+      - name: Install cargo-binstall
+        uses: taiki-e/install-action@cargo-binstall
+
+      - name: Install grcov
+        uses: actions-rs/cargo@v1
         with:
+          command: binstall
           args: |
-            [
-              {
-                "crate": "grcov",
-                "version": "^0.8",
-                "pkg_url": "{ repo }/releases/download/v{ version }/{ name }-{ target }.tar.bz2",
-                "pkg_fmt": "tbz2",
-                "bin_dir": "{ bin }{ binary-ext }"
-              }
-            ]
+            grcov@^0.8
+            --pkg-url '{ repo }/releases/download/v{ version }/{ name }-{ target }.tar.bz2'
+            --pkg-fmt tgz2
+            --bin-dir '{ bin }{ binary-ext }'
 
       - run: >
           tr : '\n' <<<"$PATH"
@@ -131,19 +130,18 @@ jobs:
           gtar --version
         shell: bash
 
-      - name: cargo-binstall
-        uses: ./.github/actions/cargo-binstall
+      - name: Install cargo-binstall
+        uses: taiki-e/install-action@cargo-binstall
+
+      - name: Install cargo-udeps
+        uses: actions-rs/cargo@v1
         with:
+          command: binstall
           args: |
-            [
-              {
-                "crate": "cargo-udeps",
-                "version": "^0.1",
-                "pkg_url": "{ repo }/releases/download/v{ version }/{ name }-v{ version }-{ target }.${{ matrix.cargo-udeps-archive-format }}",
-                "pkg_fmt": ${{ toJSON(matrix.cargo-udeps-pkg-fmt) }},
-                "bin_dir": "{ name }-v{ version }-{ target }/{ bin }{ binary-ext }"
-              }
-            ]
+            cargo-udeps@^0.1
+            --pkg-url '{ repo }/releases/download/v{ version }/{ name }-v{ version }-{ target }.${{ matrix.cargo-udeps-archive-format }}'
+            --pkg-fmt ${{ toJSON(matrix.cargo-udeps-pkg-fmt) }}
+            --bin-dir '{ name }-v{ version }-{ target }/{ bin }{ binary-ext }'
 
       - name: Restore cache
         uses: actions/cache@v2
