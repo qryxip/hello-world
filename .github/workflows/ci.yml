@@ -59,7 +59,7 @@ jobs:
           args: |
             grcov@^0.8
             --pkg-url '{ repo }/releases/download/v{ version }/{ name }-{ target }.tar.bz2'
-            --pkg-fmt tgz2
+            --pkg-fmt tbz2
             --bin-dir '{ bin }{ binary-ext }'
 
       - run: >
