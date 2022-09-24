@@ -60,7 +60,7 @@ jobs:
             grcov
             --version ^0.8
             --pkg-url '{ repo }/releases/download/v{ version }/{ name }-{ target }.tar.bz2'
-            --pkg-fmt Tbz2
+            --pkg-fmt tbz2
             --bin-dir '{ bin }{ binary-ext }'
             --no-confirm
 
@@ -96,9 +96,9 @@ jobs:
           - x86_64-apple-darwin
           - x86_64-unknown-linux-gnu
         include:
-          - { channel: stable, target-triple: x86_64-pc-windows-msvc  , exe-suffix: .exe, cargo-udeps-archive-format: zip   , cargo-udeps-pkg-fmt: Zip, os: windows-2022 }
-          - { channel: stable, target-triple: x86_64-apple-darwin     , exe-suffix: ''  , cargo-udeps-archive-format: tar.gz, cargo-udeps-pkg-fmt: Tgz, os: macos-11     }
-          - { channel: stable, target-triple: x86_64-unknown-linux-gnu, exe-suffix: ''  , cargo-udeps-archive-format: tar.gz, cargo-udeps-pkg-fmt: Tgz, os: ubuntu-20.04 }
+          - { channel: stable, target-triple: x86_64-pc-windows-msvc  , exe-suffix: .exe, cargo-udeps-archive-format: zip   , cargo-udeps-pkg-fmt: zip, os: windows-2022 }
+          - { channel: stable, target-triple: x86_64-apple-darwin     , exe-suffix: ''  , cargo-udeps-archive-format: tar.gz, cargo-udeps-pkg-fmt: tgz, os: macos-11     }
+          - { channel: stable, target-triple: x86_64-unknown-linux-gnu, exe-suffix: ''  , cargo-udeps-archive-format: tar.gz, cargo-udeps-pkg-fmt: tgz, os: ubuntu-20.04 }
 
     name: stable-${{ matrix.target-triple }}
     runs-on: ${{ matrix.os }}
