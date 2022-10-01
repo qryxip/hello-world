@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up `stable`
         uses: actions-rs/toolchain@v1
@@ -40,7 +40,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up `stable`
         uses: actions-rs/toolchain@v1
@@ -81,7 +81,7 @@ jobs:
         run: grcov . -b ./target/debug -s . -t lcov --branch --ignore-not-existing --ignore '/*' -o lcov.info
 
       - name: Codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: lcov.info
@@ -104,7 +104,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up `stable`
         id: install-toolchain
@@ -139,7 +139,7 @@ jobs:
             --no-confirm
 
       - name: Restore cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/.cargo/git
@@ -175,10 +175,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Python 3.10
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
@@ -201,7 +201,7 @@ jobs:
         shell: python
 
       - name: Upload the release notes
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: release-notes
           path: release-notes.md
@@ -213,7 +213,7 @@ jobs:
 
     steps:
       - name: Download the release notes
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: release-notes
           path: .
